@@ -1,0 +1,1 @@
+export { PasswordStrengthTooltip as default } from './password_strength_tooltip';

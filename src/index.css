@@ -1,0 +1,206 @@
+/* index.css (global styles) */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+/* LoginPage.css (local styles) */
+.mobileSizeCard {
+  max-width: 500px;
+  padding: 20px 40px;
+  border-radius: 10px;
+  min-width: 400px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Media queries for different screen sizes for login page */
+
+@media (min-width: 310px) and (max-width: 330px) {
+  .mobileSizeCard {
+    padding: 5px 10px;
+    border-radius: 10px;
+    min-width: 250px;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@media (min-width: 350px) and (max-width: 390px) {
+  .mobileSizeCard {
+    padding: 5px 10px;
+    border-radius: 10px;
+    min-width: 250px;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@media (min-width: 420px) and (max-width: 550px) {
+  .mobileSizeCard {
+    padding: 20px 40px;
+    border-radius: 10px;
+    min-width: 300px;
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* Media queries for different screen sizes for forgot password page */
+
+.forgot-password-page-content {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  margin-bottom: 380px;
+}
+
+.forgot-password-page-stepper-container {
+  width: 60%;
+  position: sticky;
+  top: 70px;
+}
+
+@media (min-width: 420px) and (max-width: 440px) {
+  /* for forgot password page */
+  .forgot-password-page-container {
+    padding: 170px 20px 220px 20px !important;
+  }
+
+  .forgot-password-page-bgimage {
+    transform: rotate(90deg) !important;
+    width: 170% !important;
+  }
+
+  .forgot-password-page-content {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    margin-bottom: 250px;
+  }
+
+  .forgot-password-page-stepper {
+    width: 80px !important;
+  }
+
+  .forgot-password-page-stepper-container {
+    width: 65%;
+  }
+
+  .forgot-password-page-emailInstructor-text {
+    width: 260px !important;
+    margin: 10px 0px 10px 60px !important;
+  }
+
+  .forgot-password-page-inputfield {
+    width: 250px !important;
+    margin: 10px 0px 10px 70px !important;
+  }
+
+  .forgot-password-page-inputfields {
+    width: 250px !important;
+    margin: 0px 30px 10px 50px !important;
+  }
+}
+
+@media (min-width: 750px) and (max-width: 780px) {
+  /* for login page */
+  .mobileSizeCard {
+    max-width: 500px;
+    padding: 20px 40px;
+    border-radius: 10px;
+    min-width: 400px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* for forgot password page */
+  .forgot-password-page-container {
+    padding: 130px 0px !important;
+  }
+
+  .forgot-password-page-content {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    margin-bottom: 290px;
+  }
+
+  .forgot-password-page-stepper {
+    width: 180px !important;
+  }
+
+  .forgot-password-page-stepper-container {
+    width: 70%;
+  }
+
+  .forgot-password-page-step-content {
+    width: 50% !important;
+  }
+
+  .forgot-password-page-emailInstructor-text {
+    margin: 10px 0px !important;
+  }
+
+  .forgot-password-page-stepcontent-button {
+    margin-top: 20px !important;
+  }
+
+  .forgot-password-step-inputfield-box {
+    margin: 10px !important;
+  }
+
+  .forgot-password-page-secondstep {
+    height: 180px !important;
+  }
+
+  .forgot-password-page-thirdstep {
+    height: 180px !important;
+  }
+}
+
+@media (min-width: 1015px) and (max-width: 1040px) {
+  .forgot-password-page-content {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    margin-bottom: 240px;
+  }
+
+  .forgot-password-page-stepper {
+    width: 300px !important;
+  }
+
+  .forgot-password-page-stepper-container {
+    width: 90%;
+  }
+
+  .forgot-password-page-step-content {
+    width: 90% !important;
+  }
+
+  .forgot-password-page-secondstep {
+    height: 260px !important;
+  }
+
+  .forgot-password-page-thirdstep {
+    height: 260px !important;
+  }
+}
