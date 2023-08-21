@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Grid, Typography, Link, MenuItem } from "@mui/material";
+
+import { Box, Grid, Typography, Link, MenuItem, CircularProgress } from "@mui/material";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
@@ -8,17 +9,20 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import forgotPassBgImg from "../../assets/images/forgotBg.png";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+
+import forgotPassBgImg from "../../assets/images/forgotBg.png";
 import { PasswordStrengthTooltip } from "../../ui-component/tooltips/password_strength_tooltip";
+import { useDataSources } from "../../service/UserRegistration";
 
 const steps = ["Create Account", "Verify Email Address", "Finished"];
 
 const NewRegister = () => {
     const [activeStep, setActiveStep] = useState(0);
     const navigate = useNavigate();
+    const [firstname, setFirstName] = useState("");
+    const [lastname, setLastName] = useState("");
     const [email, setEmail] = useState("");
-    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [server, setServer] = useState("Asia");
@@ -26,24 +30,40 @@ const NewRegister = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [agreed, setAgreed] = useState(false);
     const [verificationCode, setVerificationCode] = useState("");
-    const [usernameError, setUsernameError] = useState("");
+    const [fisrtnameError, setFirstNameError] = useState("");
+    const [lastnameError, setLastNameError] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
     const [confirmPasswordError, setConfirmPasswordError] = useState("");
     const [verficationCodeError, setVerificationCodeError] = useState("");
+    const [gotOtp, setGotOtp] = useState(false);
+
+    const { busy, userRegister, verifyUser } = useDataSources(firstname, lastname, email, password, verificationCode, server,);
 
     const handleNext = () => {
+        const createAccount = async () => {
+            try {
+                const response = await userRegister(firstname, lastname, email, password, server);
+                if (response.request.statusText) {
+                    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+                    setGotOtp(true);
+                }
+            } catch (error) {
+                console.error('Error creating error:', error);
+            }
+        };
         if (activeStep === 0) {
             if (!validateEmail() || !validatePassword() || !validateConfirmPassword()) {
                 return;
             }
         }
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        createAccount();
     };
 
     const handleReset = () => {
-        // setActiveStep(0);
-        setUsername("");
+        setActiveStep(0);
+        setFirstName("");
+        setLastName("");
         setEmail("");
         setPassword("");
         setConfirmPassword("");
@@ -56,13 +76,18 @@ const NewRegister = () => {
     };
 
     const handliSubmit = () => {
+        const verifyingUser = async () => {
+            const response = await verifyUser(email, verificationCode);
+            if (response.request.statusText == "Created") {
+                setActiveStep((prevActiveStep) => prevActiveStep + 1);
+            }
+        };
         if (activeStep === 1) {
             if (!validateVerificationCode()) {
                 return;
             }
         }
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-        handleReset();
+        verifyingUser();
     };
 
     const togglePasswordVisibility = () => {
@@ -81,14 +106,19 @@ const NewRegister = () => {
         return !(verificationCode);
     };
 
-    const validateUserName = () => {
-        if (!username) {
-            setUsernameError("This is a required field.");
+    const validateFirstName = () => {
+        if (!firstname) {
+            setFirstNameError("This is required field.");
             return false;
         }
-        setEmailError("");
-        return true;
-    };
+    }
+
+    const validateLastName = () => {
+        if (!firstname) {
+            setLastNameError("This is required field.");
+            return false;
+        }
+    }
 
     const validateEmail = () => {
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -212,19 +242,19 @@ const NewRegister = () => {
                                         display: "flex",
                                         alignItems: "center",
                                         width: "500px",
-                                        marginBottom: "24px",
+                                        marginBottom: fisrtnameError ? "2px" : "15px",
                                     }}
                                 >
-                                    <Box sx={{ mr: 1, width: "200px" }}>Username:</Box>
+                                    <Box sx={{ mr: 1, width: "200px" }}>First Name:</Box>
                                     <TextField
                                         size="small"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
+                                        value={firstname}
+                                        onChange={(e) => setFirstName(e.target.value)}
                                         variant="outlined"
                                         fullWidth
-                                        error={!!usernameError}
-                                        helperText={usernameError}
-                                        onBlur={validateUserName}
+                                        error={!!fisrtnameError}
+                                        helperText={fisrtnameError}
+                                        onBlur={validateFirstName}
                                     />
                                 </Box>
                                 <Box
@@ -232,7 +262,27 @@ const NewRegister = () => {
                                         display: "flex",
                                         alignItems: "center",
                                         width: "500px",
-                                        marginBottom: "24px",
+                                        marginBottom: lastnameError ? "2px" : "15px"
+                                    }}
+                                >
+                                    <Box sx={{ mr: 1, width: "200px" }}>Last Name:</Box>
+                                    <TextField
+                                        size="small"
+                                        value={lastname}
+                                        onChange={(e) => setLastName(e.target.value)}
+                                        variant="outlined"
+                                        fullWidth
+                                        error={!!lastnameError}
+                                        helperText={lastnameError}
+                                        onBlur={validateLastName}
+                                    />
+                                </Box>
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        width: "500px",
+                                        marginBottom: emailError ? "2px" : "15px"
                                     }}
                                 >
                                     <Box sx={{ mr: 1, width: "200px" }}>Email Address:</Box>
@@ -246,13 +296,14 @@ const NewRegister = () => {
                                         helperText={emailError}
                                         onBlur={validateEmail}
                                     />
+                                    <PasswordStrengthTooltip password={password} validatePassword={validatePassword} />
                                 </Box>
                                 <Box
                                     sx={{
                                         display: "flex",
                                         alignItems: "center",
                                         width: "500px",
-                                        marginBottom: "24px",
+                                        marginBottom: passwordError ? "2px" : "15px"
                                     }}
                                 >
                                     <Box sx={{ mr: 1, width: "200px" }}>Password:</Box>
@@ -284,14 +335,13 @@ const NewRegister = () => {
                                             ),
                                         }}
                                     />
-                                    <PasswordStrengthTooltip password={password} validatePassword={validatePassword} />
                                 </Box>
                                 <Box
                                     sx={{
                                         display: "flex",
                                         alignItems: "center",
                                         width: "500px",
-                                        marginBottom: "24px",
+                                        marginBottom: confirmPasswordError ? "2px" : "15px"
                                     }}
                                 >
                                     <Box sx={{ mr: 1, width: "200px" }}>Confirm Password:</Box>
@@ -329,7 +379,7 @@ const NewRegister = () => {
                                         display: "flex",
                                         alignItems: "center",
                                         width: "500px",
-                                        marginBottom: "24px",
+                                        marginBottom: "15px",
                                     }}
                                 >
                                     <Box sx={{ display: "flex", alignItems: "center", mr: 1, width: "200px" }}>
@@ -400,13 +450,27 @@ const NewRegister = () => {
                                         sx={{ background: "57afe7" }}
                                         disabled={isNextButtonDisabled()}
                                     >
-                                        Next
+                                        Next &nbsp;{busy && <CircularProgress color="warning" size={16} />}
                                     </Button>
                                 </Box>
                             </Grid>
                         )}
                         {activeStep === 1 && (
                             <Grid item xs={12} md={6} sx={{ height: "430px" }}>
+                                {gotOtp && (
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            m: 2,
+                                        }}
+                                    >
+                                        <Typography sx={{ fontSize: 15, fontWeight: 400 }}>
+                                            {`Verification code has been sent to "${email}"`}
+                                        </Typography>
+                                    </Box>
+                                )}
                                 <Box
                                     sx={{
                                         display: "flex",
@@ -439,10 +503,14 @@ const NewRegister = () => {
                                         onChange={(e) => setVerificationCode(e.target.value)}
                                         variant="outlined"
                                         fullWidth
+                                        inputProps={{ maxLength: 6 }}
                                         error={!!verficationCodeError}
                                         helperText={verficationCodeError}
                                         onBlur={validateVerificationCode}
                                     />
+                                    <Button variant="contained" color="primary" sx={{ ml: 1 }}>
+                                        Resend
+                                    </Button>
                                 </Box>
                                 <Box
                                     sx={{
@@ -458,7 +526,7 @@ const NewRegister = () => {
                                         sx={{ background: "57afe7" }}
                                         disabled={isSubmitButtonDisabled()}
                                     >
-                                        Submit
+                                        Submit &nbsp;{busy && <CircularProgress color="warning" size={16} />}
                                     </Button>
                                 </Box>
                             </Grid>
@@ -488,7 +556,7 @@ const NewRegister = () => {
                                 >
                                     <Button
                                         variant="contained"
-                                        onClick={() => (navigate("/"))}
+                                        onClick={() => (navigate("/"), handleReset())}
                                         sx={{ background: "#57afe7" }}
                                     >
                                         Finish

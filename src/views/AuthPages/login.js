@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import TextField from '@mui/material/TextField';
 import { Grid, Box, Typography, CircularProgress, useTheme, useMediaQuery } from '@mui/material';
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import Button from '@mui/material/Button';
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+
 import cityImg from '../../assets/images/city.png';
 import earthCloudImg from '../../assets/images/earthCloud.png';
 import connectorsImg from '../../assets/images/connectors.png';
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { useNavigate } from 'react-router-dom';
+import { useDataSources } from '../../service/UserRegistration';
 
 const validationSchema = yup.object({
   email: yup.string().required("This is a required field.").email("Please enter a valid email address."),
@@ -26,6 +29,7 @@ const MyForm = React.memo(() => {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { getLogin, error, errorMessage } = useDataSources();
 
   const formik = useFormik({
     initialValues,
@@ -33,10 +37,10 @@ const MyForm = React.memo(() => {
     onSubmit: async (values) => {
       try {
         setBusy(true);
-        console.log('Email:', values.email);
-        console.log('Password:', values.password);
-      } catch (error) {
-        console.error('Error:', error.message);
+        const response = await getLogin(values.email, values.password);
+        console.log("response while login", response);
+      } catch (errors) {
+        console.log('Error:', errors.response.data.message);
       } finally {
         setBusy(false);
       }
@@ -96,15 +100,24 @@ const MyForm = React.memo(() => {
           }}
         />
       </Box>
-      <Typography
-        sx={{ textAlign: 'end', color: '#57afe7', cursor: 'pointer' }}
-        onClick={() => navigate('/forgot')}
-      >
-        Forget Password?
-      </Typography>
+      {error && (
+        <Box style={{ display: "flex", justifyContent: "center", border: '1px solid red', backgroundColor: '#F3E8EA' }}>
+          <Typography sx={{ fontSize: "15px", color: "red", padding: '2px' }}>
+            ! {errorMessage}
+          </Typography>
+        </Box>
+      )}
+      <Box display="flex" justifyContent="flex-end">
+        <Typography
+          sx={{ textAlign: 'end', color: '#57afe7', cursor: 'pointer' }}
+          onClick={() => navigate('/forgot')}
+        >
+          Forget Password?
+        </Typography>
+      </Box>
       <Box display="flex" justifyContent="flex-end" sx={{ my: 2, color: '#2283bf' }}>
         <Button variant="contained" type="submit" fullWidth sx={{ height: '38px' }}>
-          Login {busy && <CircularProgress color="warning" size={16} />}
+          Login &nbsp;{busy && <CircularProgress color="warning" size={16} />}
         </Button>
       </Box>
       <Box display="flex" justifyContent="flex-end">

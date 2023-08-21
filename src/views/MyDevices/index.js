@@ -1,0 +1,1 @@
+export { MyDevices as default } from './mydevices';

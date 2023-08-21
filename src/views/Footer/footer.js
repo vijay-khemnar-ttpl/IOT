@@ -3,28 +3,6 @@ import Paper from '@mui/material/Paper';
 import { Box, Typography, Divider } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-const FooterText = styled(Typography)(({ theme }) => ({
-  color: '#fff',
-  display: 'flex',
-  position: 'relative',
-  padding: '12px 40px 12px 0px',
-  cursor: 'pointer',
-  fontSize: '17px',
-  '&:hover': {
-    color: '#2283bf', // Blue color on hover
-    textDecoration: 'underline', // Underline on hover
-  },
-}));
-
-const FooterSubText = styled(Typography)(({ theme }) => ({
-  color: '#fff',
-  cursor: 'pointer',
-  '&:hover': {
-    color: '#2283bf', // Blue color on hover
-    textDecoration: 'underline', // Underline on hover
-  },
-}));
-
 const FooterDivider = styled(Divider)({
   height: 16,
   margin: '0 6px',
@@ -33,20 +11,20 @@ const FooterDivider = styled(Divider)({
 
 export const Footer = () => {
   return (
-    <Paper style={{ background: 'black', position: 'fixed', bottom: 0, width: '100%', height: 110, borderRadius: 0 }}>
-      <Box display="flex" justifyContent="flex-start" padding="5px 100px">
-        <FooterText>About Us</FooterText>
-        <FooterText>Contact Us</FooterText>
-        <FooterText>Products</FooterText>
+    <Paper className='footer-bar' style={{ background: 'black', position: 'fixed', bottom: 0, width: '100%', height: 110, borderRadius: 0 }}>
+      <Box className="footer-bar-firstcontainer" display="flex" justifyContent="flex-start" padding="5px 100px">
+        <Typography className='footer-bar-maintext'>About Us</Typography>
+        <Typography className='footer-bar-maintext'>Contact Us</Typography>
+        <Typography className='footer-bar-maintext'>Products</Typography>
       </Box>
-      <Box display="flex" alignItems="center" justifyContent="flex-start" padding="0px 100px">
-        <FooterSubText variant="subtitle2">Cookie</FooterSubText>
+      <Box className="footer-bar-secondcontainer" display="flex" alignItems="center" justifyContent="flex-start" padding="0px 100px">
+        <Typography className='footer-bar-subtext' variant="subtitle2">Cookie</Typography>
         <FooterDivider orientation="vertical" />
-        <FooterSubText variant="subtitle2">Privacy Policy</FooterSubText>
+        <Typography className='footer-bar-subtext' variant="subtitle2">Privacy Policy</Typography>
         <FooterDivider orientation="vertical" />
-        <FooterSubText variant="subtitle2">Terms of Use</FooterSubText>
+        <Typography className='footer-bar-subtext' variant="subtitle2">Terms of Use</Typography>
         <FooterDivider orientation="vertical" />
-        <FooterSubText variant="subtitle2">Subscribe</FooterSubText>
+        <Typography className='footer-bar-subtext' variant="subtitle2">Subscribe</Typography>
       </Box>
     </Paper>
   );
