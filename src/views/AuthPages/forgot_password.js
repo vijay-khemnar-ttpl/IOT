@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography, CircularProgress } from "@mui/material";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
@@ -11,6 +11,7 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import forgotPassBgImg from "../../assets/images/forgotBg.png";
 import InfoTwoToneIcon from "@mui/icons-material/InfoTwoTone";
 import { PasswordStrengthTooltip } from "../../ui-component/tooltips/password_strength_tooltip";
+import { useDataSources } from '../../service/UserRegistration';
 
 const steps = ["Verify identity", "Reset Password", "Finished"];
 
@@ -21,12 +22,14 @@ const ForgotPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [verificationCodeError, setVerificationCodeError] = useState("");
+  const { verifyEmailForResetPassword, resetPassword } = useDataSources();
 
   const isMobileView = () => {
     return window.innerWidth < 750;
@@ -42,12 +45,24 @@ const ForgotPassword = () => {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (activeStep === 0) {
       validateEmail();
       if (!email || emailError) return;
+      try {
+        setBusy(true);
+        const response = await verifyEmailForResetPassword(email);
+        console.log("sdbc", response)
+        if (response.message == "OTP sent successfully") {
+          setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        }
+      } catch (errors) {
+        console.log("in errors");
+        return;
+      } finally {
+        setBusy(false);
+      }
     }
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
 
   const handleReset = () => {
@@ -60,6 +75,17 @@ const ForgotPassword = () => {
   };
 
   const handleSubmit = () => {
+    const passwordReset = async () => {
+      try {
+        const response = await resetPassword(email, verificationCode, password);
+        console.log("response of user resetPassword", response)
+        if (response.message == "Password reset successfully.") {
+          setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        }
+      } catch (error) {
+        console.error('Error creating error:', error);
+      }
+    };
     if (activeStep === 1) {
       if (
         !validateVerificationCode() ||
@@ -68,7 +94,7 @@ const ForgotPassword = () => {
       )
         return;
     }
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    passwordReset();
     handleReset();
   };
 
@@ -193,16 +219,14 @@ const ForgotPassword = () => {
                   className="forgot-password-page-emailInstructor-text"
                   sx={{
                     fontSize: "16px",
-                    margin: "30px 0px",
+                    margin: emailError ? "25px 0px 15px 0px" : "30px 0px",
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
-                  <InfoTwoToneIcon
-                    sx={{ marginTop: "2px", marginRight: "8px" }}
-                  />
-                  Please enter the email address of the account to retrieve your
-                  password
+                  <InfoTwoToneIcon sx={{ marginTop: "2px", marginRight: "6px" }} />
+                  Please enter the email address of the account to retrieve your password
                 </Typography>
                 <Box
                   sx={{
@@ -248,7 +272,7 @@ const ForgotPassword = () => {
                     onClick={handleNext}
                     sx={{ background: "57afe7" }}
                   >
-                    Submit
+                    Submit &nbsp;{busy && <CircularProgress color="warning" size={16} />}
                   </Button>
                 </Box>
               </Grid>
@@ -259,8 +283,22 @@ const ForgotPassword = () => {
                 xs={12}
                 md={6}
                 className="forgot-password-page-secondstep"
-                sx={{ height: "220px" }}
+                sx={{ height: "210px" }}
               >
+                <Box
+                  className="forgot-password-page-secondstep-otpsentmessage"
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    m: 2,
+                    minWidth: isMobileView() ? '100%' : '200px',
+                  }}
+                >
+                  <Typography sx={{ fontSize: 15, fontWeight: 400 }}>
+                    {`Verification code has been sent to "${email}"`}
+                  </Typography>
+                </Box>
                 <Box
                   className="forgot-password-step-inputfield-box"
                   sx={{
@@ -287,11 +325,15 @@ const ForgotPassword = () => {
                     onChange={(e) => setVerificationCode(e.target.value)}
                     variant="outlined"
                     fullWidth
+                    inputProps={{ maxLength: 6 }}
                     error={!!verificationCodeError}
                     helperText={verificationCodeError}
                     onBlur={validateVerificationCode}
                     placeholder={isMobileView() ? "Verification code" : ""}
                   />
+                  <Button variant="contained" color="primary" sx={{ ml: 1 }}>
+                    Resend
+                  </Button>
                 </Box>
                 <Box
                   className="forgot-password-step-inputfield-box"
@@ -410,7 +452,7 @@ const ForgotPassword = () => {
                     onClick={handleSubmit}
                     sx={{ background: "57afe7" }}
                   >
-                    Submit
+                    Submit &nbsp;{busy && <CircularProgress color="warning" size={16} />}
                   </Button>
                 </Box>
               </Grid>
@@ -421,6 +463,7 @@ const ForgotPassword = () => {
                 xs={12}
                 md={6}
                 className="forgot-password-page-thirdstep"
+                sx={{ height: "200px" }}
               >
                 <Box
                   sx={{

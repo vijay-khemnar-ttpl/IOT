@@ -1,0 +1,1 @@
+export { Gateways as default } from './gateways';
